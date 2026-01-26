@@ -4,27 +4,26 @@
 
 ![HBnB High-Level Package Diagram](./HBnB_Project_Diagaram.png)
 
-### 1. Layer Responsibilities
+### Layer Responsibilities
 
-* **Presentation Layer (Services & API):**
-    This is the entry point of the application. It handles all incoming client requests (via REST API endpoints) and returns the appropriate responses. Its primary job is to act as a translator between the user and the system's logic.
-    * **Key Component:** Service API.
+* **Presentation Layer (API):**
+    * **Component:** `ServiceApi`
+    * **Function:** Receives user requests and executes `handleRequest()`. It serves as the interface between the client and the application logic.
 
 * **Business Logic Layer (Models):**
-    The "brain" of the application. This layer enforces business rules and manages our core entities (User, Place, Review, and Amenity). It ensures data is valid before it is saved or updated.
-    * **Key Components:** HBnB Facade, Domain Models.
+    * **Component:** `HBnB Facade`
+    * **Function:** Orchestrates the system logic via `processRequest()`. It manages the core entities: **User**, **Place**, **Review**, and **Amenity**.
 
-* **Persistence Layer:**
-    The "memory" of the application. It abstracts the storage logic so the rest of the system doesn't need to worry about *how* data is saved. In this stage, it manages data storage (initially file-based, transitioning to a database later).
-    * **Key Component:** Database Access / Storage Engine.
+* **Persistence Layer (Database):**
+    * **Component:** `DatabaseAccess`
+    * **Function:** Handles data storage and retrieval. It executes `excecuteRequest()` to interact with the database engine while abstracting storage details from other layers.
 
 ---
 
-### 2. The Facade Pattern
+### Facade Pattern Explanation
 
-The **HBnB Facade** serves as a unified interface between the Presentation and Business Logic layers. 
+The **HBnB Facade** is positioned in the Business Logic Layer to act as a single entry point for the Presentation Layer.
 
-**Why it is used:**
-* **Simplification:** Instead of the API talking to every individual model (User, Place, etc.), it only communicates with the Facade.
-* **Decoupling:** If we change how the models work internally, we only need to update the Facade. The API doesn't have to change at all.
-* **Efficiency:** It coordinates complex operations (like creating a Place and linking it to an Owner) in one single call from the Presentation layer.
+* **Purpose:** It simplifies the interaction between layers by providing a unified interface.
+* **Benefit:** It decouples the API from the internal models. Changes to individual models do not require changes to the API controllers.
+* **Process:** The API calls the Facade, which then coordinates the necessary actions across the various domain models.
