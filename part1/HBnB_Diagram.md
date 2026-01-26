@@ -2,7 +2,7 @@
 
 ## Task 1: High-Level Package Diagram
 
-![HBnB High-Level Package Diagram](part1/HBnB_Project_Diagaram.png)
+![HBnB High-Level Package Diagram](./HBnB_Project_Diagaram.png)
 
 ### 1. Layer Responsibilities
 
