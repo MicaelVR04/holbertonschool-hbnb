@@ -1,12 +1,7 @@
-from flask import Flask
-from flask_restx import Api
-from app.api.v1.users import api as users_ns
+from app.models.base_model import BaseModel
+from app.models.user import User
+from app.models.place import Place
+from app.models.review import Review
+from app.models.amenity import Amenity
 
-def create_app():
-    app = Flask(__name__)
-    api = Api(app, version='1.0', title='HBnB API', description='HBnB Application API')
-
-    # Register the users namespace
-    api.add_namespace(users_ns, path='/api/v1/users')
-    
-    return app
+__all__ = ['BaseModel', 'User', 'Place', 'Review', 'Amenity']
