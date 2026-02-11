@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Test files
+test_*.py
+TEST_RESULTS.txt
+*_test*.py
+
+# Documentation files (generated for reference)
+*_REPORT.md
+SWAGGER_*.md
+TASK*_*.md
+STUDY_*.md
+*_STATUS.md
+*_GUIDE.md
+QUICK_*.md
+*ENDPOINTS.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+.env
+*.db
