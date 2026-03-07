@@ -1,16 +1,12 @@
-from flask import Flask
-from app.api import blueprint
-from config import config
+from app import create_app
 
-app = Flask(__name__)
-app.config.from_object(config['default'])
+app = create_app()
 
-# Register the API blueprint
-app.register_blueprint(blueprint)
 
-@app.route('/')
+@app.route("/")
 def hello():
     return "HBnB Project is Running!"
 
-if __name__ == '__main__':
-    app.run(debug=app.config['DEBUG'])
+
+if __name__ == "__main__":
+    app.run(debug=app.config.get("DEBUG", False))
