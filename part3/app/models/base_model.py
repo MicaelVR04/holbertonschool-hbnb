@@ -1,19 +1,24 @@
 import uuid
 from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
 
-class BaseModel:
+db = SQLAlchemy()
+
+class BaseModel(db.Model):
     """Base class for all models in the HBnB project."""
-    def __init__(self):
-        self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+    __abstract__ = True
+
+    id = db.Column(db.String(60), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def save(self):
-        """Update the updated_at timestamp whenever the object is modified."""
-        self.updated_at = datetime.now()
+        """Save the object to the database."""
+        db.session.add(self)
+        db.session.commit()
 
     def update(self, data):
-        """Update the attributes of the object based on a dictionary."""
+        """Update attributes and save."""
         for key, value in data.items():
             if hasattr(self, key):
                 setattr(self, key, value)
