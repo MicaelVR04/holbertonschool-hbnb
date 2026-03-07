@@ -1,12 +1,12 @@
-from app.models.base_model import BaseModel
+from app.models.base_model import BaseModel, db
 
 class Review(BaseModel):
-    def __init__(self, text, rating, place, user):
-        super().__init__()
-        if not (1 <= rating <= 5):
-            raise ValueError("Rating must be between 1 and 5")
-        
-        self.text = text
-        self.rating = rating
-        self.place = place  # This should be a Place object
-        self.user = user    # This should be a User object
+    """Review model."""
+
+    __tablename__ = "reviews"
+
+    text = db.Column(db.String(1024), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
+
+    user_id = db.Column(db.String(60), db.ForeignKey("users.id"), nullable=False)
+    place_id = db.Column(db.String(60), db.ForeignKey("places.id"), nullable=False)
