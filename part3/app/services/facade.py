@@ -29,25 +29,13 @@ class HBnBFacade:
     # ==================== USER OPERATIONS ====================
     
     def create_user(self, user_data):
-        """
-        Create a new user.
-        
-        Args:
-            user_data: Dictionary with 'first_name', 'last_name', 'email'
-        
-        Returns:
-            The newly created User object
-        """
-        # Create a new User instance with provided data
         new_user = User(
             first_name=user_data['first_name'],
             last_name=user_data['last_name'],
             email=user_data['email']
         )
-        
-        # Store it in the repository
+        new_user.hash_password(user_data['password'])
         self.repository.add(new_user)
-        
         return new_user
 
     def get_user_by_email(self, email):
@@ -59,6 +47,12 @@ class HBnBFacade:
         
         Returns:
             The User object if found, None otherwise
+        """
+        return self.repository.find_by_attribute('User', 'email', email)
+
+    def get_user_by_email(self, email):
+        """
+        Find a user by email.
         """
         return self.repository.find_by_attribute('User', 'email', email)
 
