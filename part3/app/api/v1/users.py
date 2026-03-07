@@ -9,7 +9,8 @@ api = Namespace('users', description='User operations')
 user_model = api.model('User', {
     'first_name': fields.String(required=True, description='First name of the user'),
     'last_name': fields.String(required=True, description='Last name of the user'),
-    'email': fields.String(required=True, description='Email of the user')
+    'email': fields.String(required=True, description='Email of the user'),
+    'password': fields.String(required=True, description='Password of the user')
 })
 
 # Define a model for user updates (all fields optional for partial updates)
@@ -29,6 +30,10 @@ user_output_model = api.model('UserOutput', {
     'updated_at': fields.String(description='Last update timestamp')
 })
 
+user_created_model = api.model('UserCreated', {
+    'id': fields.String(description='User ID'),
+    'message': fields.String(description='Success message')
+})
 
 @api.route('/')
 class UserList(Resource):
@@ -50,32 +55,20 @@ class UserList(Resource):
         return users, 200
 
     @api.expect(user_model, validate=True)
-    @api.marshal_with(user_output_model, code=201)
+    @api.marshal_with(user_created_model, code=201)
     def post(self):
-        """
-        Register a new user.
-        
-        Validates that email isn't already in use, then creates new user.
-        
-        Returns:
-            The newly created user object with 201 status code
-        """
         user_data = api.payload
-        
-        # Check if email already exists
+
         existing_user = facade.get_user_by_email(user_data['email'])
         if existing_user:
             api.abort(400, 'Email already registered')
 
-        # Create the user through the facade
         try:
             new_user = facade.create_user(user_data)
         except ValueError as e:
             api.abort(400, str(e))
-        
-        # Return 201 (Created) status code
-        return new_user, 201
 
+        return {"id": new_user.id, "message": "User created successfully"}, 201
 
 @api.route('/<string:user_id>')
 class UserDetail(Resource):
