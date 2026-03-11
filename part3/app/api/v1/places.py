@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from app.services.facade import facade
 
 api = Namespace('places', description='Place operations')
@@ -50,14 +50,9 @@ class PlaceList(Resource):
     def post(self):
         place_data = api.payload
         current_user = get_jwt_identity()
-
         place_data['owner_id'] = current_user
 
-        try:
-            new_place = facade.create_place(place_data)
-        except ValueError as e:
-            api.abort(400, str(e))
-
+        new_place = facade.create_place(place_data)
         if not new_place:
             api.abort(400, 'Failed to create place')
 
@@ -82,22 +77,18 @@ class PlaceDetail(Resource):
         if not place:
             api.abort(404, f"Place {place_id} not found")
 
+        claims = get_jwt()
+        is_admin = claims.get('is_admin', False)
         current_user = get_jwt_identity()
 
         place_owner_id = getattr(place, 'owner_id', None)
         if not place_owner_id and getattr(place, 'owner', None):
             place_owner_id = getattr(place.owner, 'id', None)
 
-        if place_owner_id != current_user:
+        if not is_admin and place_owner_id != current_user:
             api.abort(403, "Unauthorized action")
 
-        place_data = api.payload
-
-        try:
-            updated_place = facade.update_place(place_id, place_data)
-        except ValueError as e:
-            api.abort(400, str(e))
-
+        updated_place = facade.update_place(place_id, api.payload)
         if not updated_place:
             api.abort(400, 'Failed to update place')
 
