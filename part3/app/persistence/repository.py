@@ -1,108 +1,73 @@
-"""
-Repository Pattern Implementation
-The Repository acts as an in-memory data store.
-It abstracts data access logic and provides a clean interface.
-"""
+from app.models.base_model import db
+
 
 class Repository:
     """
-    In-memory repository for storing and retrieving model instances.
-    
-    The repository pattern provides a way to abstract data access logic.
-    Benefits:
-    - Easy to swap with a real database later
-    - Business logic doesn't know about storage implementation
-    - Centralized place to manage all data operations
+    In-memory repository (kept temporarily for non-user entities
+    until all models are fully migrated).
     """
-    
     def __init__(self):
-        # Dictionary to store all objects: {entity_type: {id: object}}
-        self.storage = {}
+        self._storage = {}
 
     def add(self, obj):
-        """
-        Add an object to the repository.
-        
-        Args:
-            obj: The object to store (must have an 'id' attribute)
-        """
-        # Get the class name (e.g., 'User', 'Place')
-        entity_type = obj.__class__.__name__
-        
-        # Initialize the entity type if it doesn't exist
-        if entity_type not in self.storage:
-            self.storage[entity_type] = {}
-        
-        # Store the object by its ID
-        self.storage[entity_type][obj.id] = obj
+        class_name = obj.__class__.__name__
+        if class_name not in self._storage:
+            self._storage[class_name] = {}
+        self._storage[class_name][obj.id] = obj
 
-    def get(self, obj_id, entity_type):
-        """
-        Retrieve an object by ID and entity type.
-        
-        Args:
-            obj_id: The ID of the object to retrieve
-            entity_type: The class name (e.g., 'User', 'Place')
-        
-        Returns:
-            The object if found, None otherwise
-        """
-        if entity_type not in self.storage:
-            return None
-        return self.storage[entity_type].get(obj_id)
+    def get(self, obj_id, class_name):
+        return self._storage.get(class_name, {}).get(obj_id)
 
-    def get_all(self, entity_type):
-        """
-        Retrieve all objects of a specific type.
-        
-        Args:
-            entity_type: The class name (e.g., 'User', 'Place')
-        
-        Returns:
-            A list of all objects of that type
-        """
-        if entity_type not in self.storage:
-            return []
-        return list(self.storage[entity_type].values())
+    def get_all(self, class_name):
+        return list(self._storage.get(class_name, {}).values())
 
     def update(self, obj):
-        """
-        Update an existing object.
-        
-        Args:
-            obj: The object to update (must have an 'id' attribute)
-        """
-        entity_type = obj.__class__.__name__
-        if entity_type in self.storage and obj.id in self.storage[entity_type]:
-            self.storage[entity_type][obj.id] = obj
+        class_name = obj.__class__.__name__
+        if class_name in self._storage and obj.id in self._storage[class_name]:
+            self._storage[class_name][obj.id] = obj
 
-    def delete(self, obj_id, entity_type):
-        """
-        Delete an object by ID and entity type.
-        
-        Args:
-            obj_id: The ID of the object to delete
-            entity_type: The class name (e.g., 'User', 'Place')
-        """
-        if entity_type in self.storage and obj_id in self.storage[entity_type]:
-            del self.storage[entity_type][obj_id]
+    def delete(self, obj_id, class_name):
+        if class_name in self._storage and obj_id in self._storage[class_name]:
+            del self._storage[class_name][obj_id]
 
-    def find_by_attribute(self, entity_type, attribute, value):
-        """
-        Find an object by an attribute value (e.g., find user by email).
-        
-        Args:
-            entity_type: The class name (e.g., 'User')
-            attribute: The attribute name (e.g., 'email')
-            value: The value to search for
-        
-        Returns:
-            The first object matching the criteria, or None
-        """
-        if entity_type not in self.storage:
-            return None
-        
-        for obj in self.storage[entity_type].values():
-            if hasattr(obj, attribute) and getattr(obj, attribute) == value:
+    def find_by_attribute(self, class_name, attr_name, attr_value):
+        for obj in self._storage.get(class_name, {}).values():
+            if getattr(obj, attr_name, None) == attr_value:
                 return obj
         return None
+
+
+class SQLAlchemyRepository:
+    """Generic SQLAlchemy repository for one model."""
+    def __init__(self, model):
+        self.model = model
+
+    def add(self, obj):
+        db.session.add(obj)
+        db.session.commit()
+
+    def get(self, obj_id):
+        return db.session.get(self.model, obj_id)
+
+    def get_all(self):
+        return self.model.query.all()
+
+    def update(self, obj_id, data):
+        obj = self.get(obj_id)
+        if not obj:
+            return None
+        for key, value in data.items():
+            setattr(obj, key, value)
+        db.session.commit()
+        return obj
+
+    def delete(self, obj_id):
+        obj = self.get(obj_id)
+        if not obj:
+            return False
+        db.session.delete(obj)
+        db.session.commit()
+        return True
+
+    def find_by_attribute(self, attr_name, attr_value):
+        return self.model.query.filter_by(**{attr_name: attr_value}).first()
