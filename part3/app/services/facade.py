@@ -1,15 +1,19 @@
-from app.persistence.repository import Repository
-from app.persistence.user_repository import UserRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
+from app.persistence.user_repository import UserRepository
+from app.persistence.place_repository import PlaceRepository
+from app.persistence.review_repository import ReviewRepository
+from app.persistence.amenity_repository import AmenityRepository
 
 
 class HBnBFacade:
     def __init__(self):
-        self.repository = Repository()      # temp for place/review/amenity
-        self.user_repo = UserRepository()   # SQLAlchemy user repo
+        self.user_repo = UserRepository()
+        self.place_repo = PlaceRepository()
+        self.review_repo = ReviewRepository()
+        self.amenity_repo = AmenityRepository()
 
     # USER
     def create_user(self, user_data):
@@ -40,30 +44,26 @@ class HBnBFacade:
         owner = self.get_user(place_data['owner_id'])
         if not owner:
             return None
+
         new_place = Place(
             title=place_data['title'],
             description=place_data['description'],
             price=place_data['price'],
             latitude=place_data['latitude'],
             longitude=place_data['longitude'],
-            owner=owner
+            owner_id=place_data['owner_id']
         )
-        self.repository.add(new_place)
+        self.place_repo.add(new_place)
         return new_place
 
     def get_place(self, place_id):
-        return self.repository.get(place_id, 'Place')
+        return self.place_repo.get(place_id)
 
     def get_all_places(self):
-        return self.repository.get_all('Place')
+        return self.place_repo.get_all()
 
     def update_place(self, place_id, place_data):
-        place = self.repository.get(place_id, 'Place')
-        if not place:
-            return None
-        place.update(place_data)
-        self.repository.update(place)
-        return place
+        return self.place_repo.update(place_id, place_data)
 
     # REVIEW
     def create_review(self, review_data):
@@ -71,58 +71,45 @@ class HBnBFacade:
         user = self.get_user(review_data['user_id'])
         if not place or not user:
             return None
+
         new_review = Review(
             text=review_data['text'],
             rating=review_data['rating'],
-            place=place,
-            user=user
+            place_id=review_data['place_id'],
+            user_id=review_data['user_id']
         )
-        self.repository.add(new_review)
+        self.review_repo.add(new_review)
         return new_review
 
     def get_review(self, review_id):
-        return self.repository.get(review_id, 'Review')
+        return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
-        return self.repository.get_all('Review')
+        return self.review_repo.get_all()
 
     def get_reviews_by_place(self, place_id):
-        return [r for r in self.repository.get_all('Review') if r.place.id == place_id]
+        return self.review_repo.get_reviews_by_place(place_id)
 
     def update_review(self, review_id, review_data):
-        review = self.repository.get(review_id, 'Review')
-        if not review:
-            return None
-        review.update(review_data)
-        self.repository.update(review)
-        return review
+        return self.review_repo.update(review_id, review_data)
 
     def delete_review(self, review_id):
-        review = self.repository.get(review_id, 'Review')
-        if not review:
-            return False
-        self.repository.delete(review_id, 'Review')
-        return True
+        return self.review_repo.delete(review_id)
 
     # AMENITY
     def create_amenity(self, amenity_data):
         new_amenity = Amenity(name=amenity_data['name'])
-        self.repository.add(new_amenity)
+        self.amenity_repo.add(new_amenity)
         return new_amenity
 
     def get_amenity(self, amenity_id):
-        return self.repository.get(amenity_id, 'Amenity')
+        return self.amenity_repo.get(amenity_id)
 
     def get_all_amenities(self):
-        return self.repository.get_all('Amenity')
+        return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        amenity = self.repository.get(amenity_id, 'Amenity')
-        if not amenity:
-            return None
-        amenity.update(amenity_data)
-        self.repository.update(amenity)
-        return amenity
+        return self.amenity_repo.update(amenity_id, amenity_data)
 
 
 facade = HBnBFacade()
