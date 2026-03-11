@@ -11,7 +11,7 @@ class User(BaseModel):
     last_name = db.Column(db.String(128), nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    is_admin = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships
     places = db.relationship("Place", backref="owner", lazy=True)
