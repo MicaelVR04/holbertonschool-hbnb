@@ -1,24 +1,17 @@
-"""
-Facade Pattern Implementation
-The Facade simplifies interaction between the API and data layers.
-It contains all business logic and validation rules.
-"""
-
 from app.persistence.repository import Repository
+from app.persistence.user_repository import UserRepository
 from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
-from app.persistence.repository import Repository, SQLAlchemyRepository
-from app.models.user import User
+
 
 class HBnBFacade:
     def __init__(self):
-        self.repository = Repository()               # temporary for non-user entities
-        self.user_repo = SQLAlchemyRepository(User) # users now via SQLAlchemy
+        self.repository = Repository()      # temp for place/review/amenity
+        self.user_repo = UserRepository()   # SQLAlchemy user repo
 
-    # ==================== USER OPERATIONS ====================
-
+    # USER
     def create_user(self, user_data):
         new_user = User(
             first_name=user_data['first_name'],
@@ -31,7 +24,7 @@ class HBnBFacade:
         return new_user
 
     def get_user_by_email(self, email):
-        return self.user_repo.find_by_attribute('email', email)
+        return self.user_repo.get_user_by_email(email)
 
     def get_user(self, user_id):
         return self.user_repo.get(user_id)
@@ -42,13 +35,11 @@ class HBnBFacade:
     def update_user(self, user_id, user_data):
         return self.user_repo.update(user_id, user_data)
 
-    # ==================== PLACE OPERATIONS ====================
-
+    # PLACE
     def create_place(self, place_data):
         owner = self.get_user(place_data['owner_id'])
         if not owner:
             return None
-
         new_place = Place(
             title=place_data['title'],
             description=place_data['description'],
@@ -57,7 +48,6 @@ class HBnBFacade:
             longitude=place_data['longitude'],
             owner=owner
         )
-
         self.repository.add(new_place)
         return new_place
 
@@ -71,26 +61,22 @@ class HBnBFacade:
         place = self.repository.get(place_id, 'Place')
         if not place:
             return None
-
         place.update(place_data)
         self.repository.update(place)
         return place
 
-    # ==================== REVIEW OPERATIONS ====================
-
+    # REVIEW
     def create_review(self, review_data):
         place = self.get_place(review_data['place_id'])
         user = self.get_user(review_data['user_id'])
         if not place or not user:
             return None
-
         new_review = Review(
             text=review_data['text'],
             rating=review_data['rating'],
             place=place,
             user=user
         )
-
         self.repository.add(new_review)
         return new_review
 
@@ -101,14 +87,12 @@ class HBnBFacade:
         return self.repository.get_all('Review')
 
     def get_reviews_by_place(self, place_id):
-        all_reviews = self.repository.get_all('Review')
-        return [review for review in all_reviews if review.place.id == place_id]
+        return [r for r in self.repository.get_all('Review') if r.place.id == place_id]
 
     def update_review(self, review_id, review_data):
         review = self.repository.get(review_id, 'Review')
         if not review:
             return None
-
         review.update(review_data)
         self.repository.update(review)
         return review
@@ -117,12 +101,10 @@ class HBnBFacade:
         review = self.repository.get(review_id, 'Review')
         if not review:
             return False
-
         self.repository.delete(review_id, 'Review')
         return True
 
-    # ==================== AMENITY OPERATIONS ====================
-
+    # AMENITY
     def create_amenity(self, amenity_data):
         new_amenity = Amenity(name=amenity_data['name'])
         self.repository.add(new_amenity)
@@ -138,7 +120,6 @@ class HBnBFacade:
         amenity = self.repository.get(amenity_id, 'Amenity')
         if not amenity:
             return None
-
         amenity.update(amenity_data)
         self.repository.update(amenity)
         return amenity
