@@ -1,8 +1,7 @@
-from app.models.base_model import BaseModel
+from app.models.base_model import BaseModel, db
+
 
 class Amenity(BaseModel):
-    def __init__(self, name):
-        super().__init__()
-        if not name:
-            raise ValueError("Amenity name is required")
-        self.name = name
+    __tablename__ = "amenities"
+
+    name = db.Column(db.String(128), nullable=False, unique=True)
