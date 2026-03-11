@@ -2,17 +2,13 @@ from app.models.base_model import db
 
 
 class Repository:
-    """
-    In-memory repository (kept temporarily for non-user entities
-    until all models are fully migrated).
-    """
+    """In-memory repository kept temporarily for non-migrated entities."""
     def __init__(self):
         self._storage = {}
 
     def add(self, obj):
         class_name = obj.__class__.__name__
-        if class_name not in self._storage:
-            self._storage[class_name] = {}
+        self._storage.setdefault(class_name, {})
         self._storage[class_name][obj.id] = obj
 
     def get(self, obj_id, class_name):
@@ -38,7 +34,6 @@ class Repository:
 
 
 class SQLAlchemyRepository:
-    """Generic SQLAlchemy repository for one model."""
     def __init__(self, model):
         self.model = model
 
@@ -68,6 +63,3 @@ class SQLAlchemyRepository:
         db.session.delete(obj)
         db.session.commit()
         return True
-
-    def find_by_attribute(self, attr_name, attr_value):
-        return self.model.query.filter_by(**{attr_name: attr_value}).first()
