@@ -9,11 +9,13 @@ from app.models.user import User
 from app.models.place import Place
 from app.models.review import Review
 from app.models.amenity import Amenity
-
+from app.persistence.repository import Repository, SQLAlchemyRepository
+from app.models.user import User
 
 class HBnBFacade:
     def __init__(self):
-        self.repository = Repository()
+        self.repository = Repository()               # temporary for non-user entities
+        self.user_repo = SQLAlchemyRepository(User) # users now via SQLAlchemy
 
     # ==================== USER OPERATIONS ====================
 
@@ -25,26 +27,20 @@ class HBnBFacade:
             is_admin=bool(user_data.get('is_admin', False))
         )
         new_user.hash_password(user_data['password'])
-        self.repository.add(new_user)
+        self.user_repo.add(new_user)
         return new_user
 
     def get_user_by_email(self, email):
-        return self.repository.find_by_attribute('User', 'email', email)
+        return self.user_repo.find_by_attribute('email', email)
 
     def get_user(self, user_id):
-        return self.repository.get(user_id, 'User')
+        return self.user_repo.get(user_id)
 
     def get_all_users(self):
-        return self.repository.get_all('User')
+        return self.user_repo.get_all()
 
     def update_user(self, user_id, user_data):
-        user = self.repository.get(user_id, 'User')
-        if not user:
-            return None
-
-        user.update(user_data)
-        self.repository.update(user)
-        return user
+        return self.user_repo.update(user_id, user_data)
 
     # ==================== PLACE OPERATIONS ====================
 
