@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB - Places</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="HBnB logo" class="logo">
+                <span class="brand-name">HBnB</span>
+            </a>
+            <a href="login.html" class="login-button">Login</a>
+        </div>
+    </header>
+
+    <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+    </nav>
+
+    <main class="page-content">
+        <section class="hero">
+            <h1>Find your next stay</h1>
+            <p>Browse comfortable places, compare prices, and explore amenities.</p>
+        </section>
+
+        <section id="filter" class="filter-bar">
+            <label for="price-filter">Max Price:</label>
+            <select id="price-filter">
+                <option value="">All</option>
+                <option value="50">$50</option>
+                <option value="100">$100</option>
+                <option value="150">$150</option>
+                <option value="200">$200</option>
+            </select>
+        </section>
+
+        <section id="places-list" class="places-grid">
+            <article class="place-card">
+                <h2>Cozy Studio</h2>
+                <p class="place-price">$85 / night</p>
+                <p class="place-location">San Juan, Puerto Rico</p>
+                <a href="place.html" class="details-button">View Details</a>
+            </article>
+
+            <article class="place-card">
+                <h2>Beachfront Escape</h2>
+                <p class="place-price">$140 / night</p>
+                <p class="place-location">Rincón, Puerto Rico</p>
+                <a href="place.html" class="details-button">View Details</a>
+            </article>
+
+            <article class="place-card">
+                <h2>Mountain Retreat</h2>
+                <p class="place-price">$110 / night</p>
+                <p class="place-location">Jayuya, Puerto Rico</p>
+                <a href="place.html" class="details-button">View Details</a>
+            </article>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

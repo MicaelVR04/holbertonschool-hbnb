@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HBnB - Add Review</title>
+    <link rel="icon" type="image/png" href="images/icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="brand">
+                <img src="images/logo.png" alt="HBnB logo" class="logo">
+                <span class="brand-name">HBnB</span>
+            </a>
+            <a href="login.html" class="login-button">Login</a>
+        </div>
+    </header>
+
+    <nav class="site-nav">
+        <a href="index.html">Home</a>
+        <a href="login.html">Login</a>
+    </nav>
+
+    <main class="page-content">
+        <section class="form-panel">
+            <div class="review-place-banner">
+                <h1>Add a Review</h1>
+                <p>You are reviewing: <strong>Beachfront Escape</strong></p>
+            </div>
+
+            <form id="review-form" class="form">
+                <label for="review">Your Review</label>
+                <textarea id="review" name="review" rows="6" placeholder="Share your experience..." required></textarea>
+
+                <label for="rating">Rating</label>
+                <select id="rating" name="rating" required>
+                    <option value="">Select a rating</option>
+                    <option value="1">1 - Poor</option>
+                    <option value="2">2 - Fair</option>
+                    <option value="3">3 - Good</option>
+                    <option value="4">4 - Very Good</option>
+                    <option value="5">5 - Excellent</option>
+                </select>
+
+                <button type="submit" class="primary-button">Submit Review</button>
+            </form>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <p>All rights reserved.</p>
+    </footer>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
