@@ -21,32 +21,59 @@ place_update_model = api.model('PlaceUpdate', {
     'longitude': fields.Float(description='Longitude coordinate')
 })
 
-place_output_model = api.model('PlaceOutput', {
-    'id': fields.String(description='Place ID'),
-    'title': fields.String(description='Title'),
-    'description': fields.String(description='Description'),
-    'price': fields.Float(description='Price per night'),
-    'latitude': fields.Float(description='Latitude'),
-    'longitude': fields.Float(description='Longitude'),
-    'owner_id': fields.String(description='Owner (User) ID'),
-    'reviews': fields.List(fields.String, description='List of review IDs'),
-    'amenities': fields.List(fields.String, description='List of amenity IDs'),
-    'created_at': fields.String(description='Creation timestamp'),
-    'updated_at': fields.String(description='Last update timestamp')
-})
+
+def serialize_review(review):
+    return {
+        "id": review.id,
+        "text": review.text,
+        "rating": review.rating,
+        "user_id": review.user_id,
+        "place_id": review.place_id,
+        "created_at": str(review.created_at),
+        "updated_at": str(review.updated_at)
+    }
+
+
+def serialize_amenity(amenity):
+    return {
+        "id": amenity.id,
+        "name": amenity.name
+    }
+
+
+def serialize_place(place):
+    amenities = []
+    if getattr(place, "amenities", None):
+        amenities = [serialize_amenity(amenity) for amenity in place.amenities]
+
+    reviews = []
+    if getattr(place, "reviews", None):
+        reviews = [serialize_review(review) for review in place.reviews]
+
+    return {
+        "id": place.id,
+        "title": place.title,
+        "description": place.description,
+        "price": place.price,
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+        "owner_id": place.owner_id,
+        "reviews": reviews,
+        "amenities": amenities,
+        "created_at": str(place.created_at),
+        "updated_at": str(place.updated_at)
+    }
 
 
 @api.route('/')
 class PlaceList(Resource):
     @api.doc('list_places')
-    @api.marshal_list_with(place_output_model)
     def get(self):
         places = facade.get_all_places()
-        return places, 200
+        return [serialize_place(place) for place in places], 200
 
     @jwt_required()
     @api.expect(place_model, validate=True)
-    @api.marshal_with(place_output_model, code=201)
     def post(self):
         place_data = api.payload
         current_user = get_jwt_identity()
@@ -56,22 +83,20 @@ class PlaceList(Resource):
         if not new_place:
             api.abort(400, 'Failed to create place')
 
-        return new_place, 201
+        return serialize_place(new_place), 201
 
 
 @api.route('/<string:place_id>')
 class PlaceDetail(Resource):
     @api.doc('get_place')
-    @api.marshal_with(place_output_model)
     def get(self, place_id):
         place = facade.get_place(place_id)
         if not place:
             api.abort(404, f"Place {place_id} not found")
-        return place, 200
+        return serialize_place(place), 200
 
     @jwt_required()
     @api.expect(place_update_model, validate=True)
-    @api.marshal_with(place_output_model)
     def put(self, place_id):
         place = facade.get_place(place_id)
         if not place:
@@ -92,4 +117,4 @@ class PlaceDetail(Resource):
         if not updated_place:
             api.abort(400, 'Failed to update place')
 
-        return updated_place, 200
+        return serialize_place(updated_place), 200
