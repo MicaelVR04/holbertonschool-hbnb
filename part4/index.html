@@ -14,7 +14,7 @@
                 <img src="images/logo.png" alt="HBnB logo" class="logo">
                 <span class="brand-name">HBnB</span>
             </a>
-            <a href="login.html" class="login-button">Login</a>
+            <a href="login.html" id="login-link" class="login-button">Login</a>
         </div>
     </header>
 
@@ -33,34 +33,14 @@
             <label for="price-filter">Max Price:</label>
             <select id="price-filter">
                 <option value="">All</option>
-                <option value="50">$50</option>
-                <option value="100">$100</option>
-                <option value="150">$150</option>
-                <option value="200">$200</option>
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
             </select>
         </section>
 
         <section id="places-list" class="places-grid">
-            <article class="place-card">
-                <h2>Cozy Studio</h2>
-                <p class="place-price">$85 / night</p>
-                <p class="place-location">San Juan, Puerto Rico</p>
-                <a href="place.html" class="details-button">View Details</a>
-            </article>
-
-            <article class="place-card">
-                <h2>Beachfront Escape</h2>
-                <p class="place-price">$140 / night</p>
-                <p class="place-location">Rincón, Puerto Rico</p>
-                <a href="place.html" class="details-button">View Details</a>
-            </article>
-
-            <article class="place-card">
-                <h2>Mountain Retreat</h2>
-                <p class="place-price">$110 / night</p>
-                <p class="place-location">Jayuya, Puerto Rico</p>
-                <a href="place.html" class="details-button">View Details</a>
-            </article>
+            <!-- Places will be populated dynamically -->
         </section>
     </main>
 
